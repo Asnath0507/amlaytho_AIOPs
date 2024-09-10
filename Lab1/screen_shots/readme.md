@@ -1,0 +1,1 @@
+Screenshots are found in this dir
