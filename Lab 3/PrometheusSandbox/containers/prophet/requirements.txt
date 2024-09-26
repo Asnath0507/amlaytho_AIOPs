@@ -1,0 +1,7 @@
+prometheus_client
+prophet
+pandas
+requests
+scikit-learn
+numpy
+plotly
