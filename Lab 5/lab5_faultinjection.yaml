@@ -1,0 +1,39 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: shippingservice
+  namespace: default
+spec:
+  hosts:
+  - shippingservice
+  http:
+  - match:
+    - sourceLabels:
+        app: frontend
+    fault:
+      delay:
+        percentage:
+          value: 100.0  
+        fixedDelay: 0.2s
+    route:
+    - destination:
+        host: shippingservice
+
+  - match:
+      - sourceLabels:
+          app: checkoutservice
+        uri:
+          regex: ".*/GetQuote"
+    fault:
+      delay:
+        percentage:
+          value: 100.0  # Apply delay to 100% of requests matching both conditions
+        fixedDelay: 0.4s
+    route:
+      - destination:
+          host: shippingservice
+  
+  # Default route without delay
+  - route:
+      - destination:
+          host: shippingservice
