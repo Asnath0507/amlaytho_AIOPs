@@ -1,0 +1,24 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: fault-injection-services
+  namespace: default
+spec:
+  hosts:
+  # - shippingservice
+  - productcatalogservice
+  http:
+  # Rule 2: Delay for requests to productcatalogservice
+  - match:
+    - sourceLabels:
+        app: frontend
+      # uri:
+      #   prefix: /productcatalogservice  # Adjust based on your routes
+    fault:
+      delay:
+        percentage:
+          value: 100.0
+        fixedDelay: 10s
+    route:
+    - destination:
+        host: productcatalogservice

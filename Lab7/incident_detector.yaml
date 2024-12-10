@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-detector-deployment  # Maintains your naming
+  labels:
+    app: incident-detector
+spec:
+  replicas: 1  # Start with 1 replica
+  selector:
+    matchLabels:
+      app: incident-detector
+  template:
+    metadata:
+      labels:
+        app: incident-detector
+      annotations:
+        prometheus.io/scrape: "true"  # Enable scraping
+        prometheus.io/port: "8098"   # Prometheus scraping port
+        prometheus.io/path: "/metrics"  # Default metrics endpoint path
+    spec:
+      containers:
+      - name: incident-detector-container  # Maintains your container name
+        imagePullPolicy: Always
+        image: assynath/updatedmonitoringapp:latest  # Maintains your image name
+        command: ["python"]
+        args:
+          [
+            "incident_detector.py",
+            "--threshold", "4",
+            "--services", "lab7_frontend_2_productcatalog", "lab7_frontend_2_shippingservice",
+            "--port", "8098"
+          ]
+        ports:
+        - containerPort: 8098  # Matches your application server's port
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi

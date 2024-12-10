@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+# metadata are assigned to the Deployment itself
+metadata:
+  name: monskeletondeploy
+  labels:
+    app: monskeleton
+    # the spec controls running pods and provides a template for new pods
+spec:
+# for running pods, how many to keep running
+  replicas: 0 
+# how to find the set of pods to control
+  selector:
+    matchLabels:
+      app: monskeletonapp
+# the template for creating new pods
+  template:
+# these metadata go on the pods, and are used above by the deployment to control them...hence must match!
+    metadata:
+      labels:
+        app: monskeletonapp
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8083"
+        prometheus.io/path: "/metrics"
+# this spec is how to build the container for each pod, its image, resources, and port assignments
+    spec:
+      containers:
+      - name: monskeletoncontainer
+        imagePullPolicy: Always
+        # image: index.docker.io/cwiecha/demoapp:latest
+        image: assynath/updatedmonitoringapp:latest
+        # image: index.docker.io/python:latest
+        command: ["python3"]
+        args:
+          - "prophet_model.py"
+          - "frontend"
+          - "productcatalogservice"
+          - "boutique_training.json"
+          - "8083"
+
+        
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 200m
